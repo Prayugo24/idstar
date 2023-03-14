@@ -1,0 +1,41 @@
+version: "3"
+services:
+  db:
+    image: mysql:8.0
+    networks:
+      - app
+    container_name: mysql
+    volumes:
+      - mysql-data:/var/lib/mysql/data
+    expose:
+      - 3306
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=qwerty12345
+      - MYSQL_USER=root
+      - MYSQL_DATABASE=squeirrel_movie
+    command: mysql -u root squeirrel_movie < ./squeirrel_movie.sql
+    restart: unless-stopped
+  # APP*****************************************
+  springbootapp:
+    image: com/idstar:latest
+    build:
+      context: .
+    networks:
+      - app
+    container_name: springbootappidstar
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/squeirrel_movie?useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=qwerty12345
+    expose:
+      - 8080
+    ports:
+      - 8080:8080
+    restart: on-failure
+    
+volumes:
+  mysql-data:
+networks:
+  app:
